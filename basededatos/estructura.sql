@@ -111,10 +111,12 @@ CREATE TABLE Mesa (
 CREATE TABLE Comanda (
     id INT IDENTITY(1,1) PRIMARY KEY,
     fecha_hora DATETIME2 NOT NULL DEFAULT GETDATE(),
+	-- Estado: 'Pendiente', 'Listo', 'Anulada'
+    estado NVARCHAR(20) NOT NULL DEFAULT 'Pendiente',  
+	fecha_hora_listo DATETIME2 NULL,
+	fecha_hora_anulacion DATETIME2 NULL,
     id_empleado_mesero INT NOT NULL,
     id_mesa INT NOT NULL,
-    -- Estado: 'Abierta', 'En Proceso', 'Cerrada', 'Cancelada'
-    estado NVARCHAR(20) NOT NULL,
     FOREIGN KEY (id_empleado_mesero) REFERENCES Empleado(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY (id_mesa) REFERENCES Mesa(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );

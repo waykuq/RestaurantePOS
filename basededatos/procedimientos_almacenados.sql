@@ -790,6 +790,71 @@ END
 GO
 
 
+-- ===================================================================
+-- 3. Marcar una comanda como "Lista para servir"
+-- Cambia el estado y registra la marca de tiempo de cuando estuvo lista.
+-- ===================================================================
+CREATE OR ALTER PROCEDURE usp_Comanda_MarcarComoLista
+    @id_comanda INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar que la comanda exista y no esté ya anulada o cerrada
+    IF EXISTS (SELECT 1 FROM dbo.Comanda WHERE id = @id_comanda AND estado NOT IN ('Anulada', 'Cerrada'))
+    BEGIN
+        UPDATE dbo.Comanda
+        SET 
+            estado = 'Listo',
+            fecha_hora_listo = GETDATE()
+        WHERE 
+            id = @id_comanda;
+
+        -- Devolver un indicador de éxito
+        SELECT 1 AS Exito;
+    END
+    ELSE
+    BEGIN
+        -- Devolver un indicador de fallo (ej. la comanda no existe o ya está cerrada/anulada)
+        SELECT 0 AS Exito;
+    END
+END
+GO
+
+-- ===================================================================
+-- 4. Anular una comanda
+-- Cambia el estado a "Anulada" y registra la marca de tiempo de la anulación.
+-- ===================================================================
+CREATE OR ALTER PROCEDURE usp_Comanda_Anular
+    @id_comanda INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Verificar que la comanda exista y no esté ya cerrada
+    IF EXISTS (SELECT 1 FROM dbo.Comanda WHERE id = @id_comanda AND estado != 'Cerrada')
+    BEGIN
+        UPDATE dbo.Comanda
+        SET 
+            estado = 'Anulada',
+            fecha_hora_anulacion = GETDATE()
+        WHERE 
+            id = @id_comanda;
+        
+        -- Devolver un indicador de éxito
+        SELECT 1 AS Exito;
+    END
+    ELSE
+    BEGIN
+        -- Devolver un indicador de fallo (ej. la comanda no existe o ya está cerrada)
+        SELECT 0 AS Exito;
+    END
+END
+GO
+
+PRINT 'Procedimientos almacenados para estados de Comanda creados exitosamente.';
+GO
+
 /********************************************************************************
  * MÓDULO: OPERACIONES DE COMPROBANTE (FACTURACIÓN)
  ********************************************************************************/
