@@ -3,58 +3,58 @@ GO
 
 /********************************************************************************
  * MÓDULO: PRODUCTOS
- * Procedimientos para: GrupoProducto, Estacion, TipoProducto, Producto
+ * Procedimientos para: ProductoGrupo, Estacion, ProductoTipo, Producto
  ********************************************************************************/
 
 -- ===================================================================
--- CRUD para la tabla: GrupoProducto
+-- CRUD para la tabla: ProductoGrupo
 -- ===================================================================
-PRINT 'Creando SPs para GrupoProducto...';
+PRINT 'Creando SPs para ProductoGrupo...';
 GO
 
-CREATE OR ALTER PROCEDURE usp_GrupoProducto_Listar
+CREATE OR ALTER PROCEDURE usp_ProductoGrupo_Listar
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre FROM dbo.GrupoProducto;
+    SELECT id, nombre FROM dbo.ProductoGrupo;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_GrupoProducto_ObtenerPorId
+CREATE OR ALTER PROCEDURE usp_ProductoGrupo_ObtenerPorId
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre FROM dbo.GrupoProducto WHERE id = @id;
+    SELECT id, nombre FROM dbo.ProductoGrupo WHERE id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_GrupoProducto_Crear
+CREATE OR ALTER PROCEDURE usp_ProductoGrupo_Crear
     @nombre NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.GrupoProducto (nombre) VALUES (@nombre);
+    INSERT INTO dbo.ProductoGrupo (nombre) VALUES (@nombre);
     SELECT SCOPE_IDENTITY() AS id_creado;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_GrupoProducto_Actualizar
+CREATE OR ALTER PROCEDURE usp_ProductoGrupo_Actualizar
     @id INT,
     @nombre NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    UPDATE dbo.GrupoProducto SET nombre = @nombre WHERE id = @id;
+    UPDATE dbo.ProductoGrupo SET nombre = @nombre WHERE id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_GrupoProducto_Eliminar
+CREATE OR ALTER PROCEDURE usp_ProductoGrupo_Eliminar
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    DELETE FROM dbo.GrupoProducto WHERE id = @id;
+    DELETE FROM dbo.ProductoGrupo WHERE id = @id;
 END
 GO
 
@@ -111,26 +111,26 @@ END
 GO
 
 -- ===================================================================
--- CRUD para la tabla: TipoProducto
+-- CRUD para la tabla: ProductoTipo
 -- ===================================================================
-PRINT 'Creando SPs para TipoProducto...';
+PRINT 'Creando SPs para ProductoTipo...';
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoProducto_Listar
+CREATE OR ALTER PROCEDURE usp_ProductoTipo_Listar
 AS
 BEGIN
     SET NOCOUNT ON;
     SELECT 
         tp.id, 
         tp.nombre, 
-        tp.id_grupoproducto, 
-        gp.nombre AS nombre_grupoproducto 
-    FROM dbo.TipoProducto tp
-    INNER JOIN dbo.GrupoProducto gp ON tp.id_grupoproducto = gp.id;
+        tp.id_productogrupo, 
+        gp.nombre AS nombre_productogrupo 
+    FROM dbo.ProductoTipo tp
+    INNER JOIN dbo.ProductoGrupo gp ON tp.id_productogrupo = gp.id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoProducto_ObtenerPorId
+CREATE OR ALTER PROCEDURE usp_ProductoTipo_ObtenerPorId
     @id INT
 AS
 BEGIN
@@ -138,45 +138,45 @@ BEGIN
     SELECT 
         tp.id, 
         tp.nombre, 
-        tp.id_grupoproducto, 
-        gp.nombre AS nombre_grupoproducto 
-    FROM dbo.TipoProducto tp
-    INNER JOIN dbo.GrupoProducto gp ON tp.id_grupoproducto = gp.id
+        tp.id_productogrupo, 
+        gp.nombre AS nombre_productogrupo 
+    FROM dbo.ProductoTipo tp
+    INNER JOIN dbo.ProductoGrupo gp ON tp.id_productogrupo = gp.id
     WHERE tp.id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoProducto_Crear
+CREATE OR ALTER PROCEDURE usp_ProductoTipo_Crear
     @nombre NVARCHAR(100),
-    @id_grupoproducto INT
+    @id_productogrupo INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.TipoProducto (nombre, id_grupoproducto) 
-    VALUES (@nombre, @id_grupoproducto);
+    INSERT INTO dbo.ProductoTipo (nombre, id_productogrupo) 
+    VALUES (@nombre, @id_productogrupo);
     SELECT SCOPE_IDENTITY() AS id_creado;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoProducto_Actualizar
+CREATE OR ALTER PROCEDURE usp_ProductoTipo_Actualizar
     @id INT,
     @nombre NVARCHAR(100),
-    @id_grupoproducto INT
+    @id_productogrupo INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    UPDATE dbo.TipoProducto 
-    SET nombre = @nombre, id_grupoproducto = @id_grupoproducto 
+    UPDATE dbo.ProductoTipo 
+    SET nombre = @nombre, id_productogrupo = @id_productogrupo 
     WHERE id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoProducto_Eliminar
+CREATE OR ALTER PROCEDURE usp_ProductoTipo_Eliminar
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    DELETE FROM dbo.TipoProducto WHERE id = @id;
+    DELETE FROM dbo.ProductoTipo WHERE id = @id;
 END
 GO
 
@@ -195,15 +195,15 @@ BEGIN
         p.nombre,
         p.descripcion,
         p.precio,
-        p.id_tipoproducto,
-        tp.nombre AS nombre_tipoproducto,
+        p.id_productotipo,
+        tp.nombre AS nombre_productotipo,
         p.id_estacion,
         e.nombre AS nombre_estacion,
         gp.nombre AS nombre_grupoproducto
     FROM dbo.Producto p
-    INNER JOIN dbo.TipoProducto tp ON p.id_tipoproducto = tp.id
+    INNER JOIN dbo.ProductoTipo tp ON p.id_productotipo = tp.id
     INNER JOIN dbo.Estacion e ON p.id_estacion = e.id
-    INNER JOIN dbo.GrupoProducto gp ON tp.id_grupoproducto = gp.id;
+    INNER JOIN dbo.ProductoGrupo gp ON tp.id_productogrupo = gp.id;
 END
 GO
 
@@ -217,15 +217,15 @@ BEGIN
         p.nombre,
         p.descripcion,
         p.precio,
-        p.id_tipoproducto,
-        tp.nombre AS nombre_tipoproducto,
+        p.id_productotipo,
+        tp.nombre AS nombre_productotipo,
         p.id_estacion,
         e.nombre AS nombre_estacion,
         gp.nombre AS nombre_grupoproducto
     FROM dbo.Producto p
-    INNER JOIN dbo.TipoProducto tp ON p.id_tipoproducto = tp.id
+    INNER JOIN dbo.ProductoTipo tp ON p.id_productotipo = tp.id
     INNER JOIN dbo.Estacion e ON p.id_estacion = e.id
-    INNER JOIN dbo.GrupoProducto gp ON tp.id_grupoproducto = gp.id
+    INNER JOIN dbo.ProductoGrupo gp ON tp.id_productogrupo = gp.id
     WHERE p.id = @id;
 END
 GO
@@ -234,13 +234,13 @@ CREATE OR ALTER PROCEDURE usp_Producto_Crear
     @nombre NVARCHAR(100),
     @descripcion NVARCHAR(255),
     @precio DECIMAL(18, 2),
-    @id_tipoproducto INT,
+    @id_productotipo INT,
     @id_estacion INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.Producto (nombre, descripcion, precio, id_tipoproducto, id_estacion)
-    VALUES (@nombre, @descripcion, @precio, @id_tipoproducto, @id_estacion);
+    INSERT INTO dbo.Producto (nombre, descripcion, precio, id_productotipo, id_estacion)
+    VALUES (@nombre, @descripcion, @precio, @id_productotipo, @id_estacion);
     SELECT SCOPE_IDENTITY() AS id_creado;
 END
 GO
@@ -250,7 +250,7 @@ CREATE OR ALTER PROCEDURE usp_Producto_Actualizar
     @nombre NVARCHAR(100),
     @descripcion NVARCHAR(255),
     @precio DECIMAL(18, 2),
-    @id_tipoproducto INT,
+    @id_productotipo INT,
     @id_estacion INT
 AS
 BEGIN
@@ -260,7 +260,7 @@ BEGIN
         nombre = @nombre,
         descripcion = @descripcion,
         precio = @precio,
-        id_tipoproducto = @id_tipoproducto,
+        id_productotipo = @id_productotipo,
         id_estacion = @id_estacion
     WHERE id = @id;
 END
@@ -277,61 +277,61 @@ GO
 
 /********************************************************************************
  * MÓDULO: PERSONAL
- * Procedimientos para: TipoEmpleado, Empleado
+ * Procedimientos para: EmpleadoTipo, Empleado
  ********************************************************************************/
 
 -- ===================================================================
--- CRUD para la tabla: TipoEmpleado
+-- CRUD para la tabla: EmpleadoTipo
 -- ===================================================================
-PRINT 'Creando SPs para TipoEmpleado...';
+PRINT 'Creando SPs para EmpleadoTipo...';
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoEmpleado_Listar
+CREATE OR ALTER PROCEDURE usp_EmpleadoTipo_Listar
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre FROM dbo.TipoEmpleado;
+    SELECT id, nombre FROM dbo.EmpleadoTipo;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoEmpleado_ObtenerPorId
+CREATE OR ALTER PROCEDURE usp_EmpleadoTipo_ObtenerPorId
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre FROM dbo.TipoEmpleado WHERE id = @id;
+    SELECT id, nombre FROM dbo.EmpleadoTipo WHERE id = @id;
 END
 GO
 
--- Crear, Actualizar y Eliminar para TipoEmpleado generalmente no se exponen
+-- Crear, Actualizar y Eliminar para EmpleadoTipo generalmente no se exponen
 -- en una aplicación, ya que son datos de sistema, pero se incluyen por completitud.
 
-CREATE OR ALTER PROCEDURE usp_TipoEmpleado_Crear
+CREATE OR ALTER PROCEDURE usp_EmpleadoTipo_Crear
     @nombre NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.TipoEmpleado (nombre) VALUES (@nombre);
+    INSERT INTO dbo.EmpleadoTipo (nombre) VALUES (@nombre);
     SELECT SCOPE_IDENTITY() AS id_creado;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoEmpleado_Actualizar
+CREATE OR ALTER PROCEDURE usp_EmpleadoTipo_Actualizar
     @id INT,
     @nombre NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    UPDATE dbo.TipoEmpleado SET nombre = @nombre WHERE id = @id;
+    UPDATE dbo.EmpleadoTipo SET nombre = @nombre WHERE id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoEmpleado_Eliminar
+CREATE OR ALTER PROCEDURE usp_EmpleadoTipo_Eliminar
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    DELETE FROM dbo.TipoEmpleado WHERE id = @id;
+    DELETE FROM dbo.EmpleadoTipo WHERE id = @id;
 END
 GO
 
@@ -350,10 +350,10 @@ BEGIN
         e.nombre,
         e.dni,
         e.usuario,
-        e.id_tipoempleado,
-        te.nombre AS nombre_tipoempleado
+        e.id_empleadotipo,
+        te.nombre AS nombre_empleadotipo
     FROM dbo.Empleado e
-    INNER JOIN dbo.TipoEmpleado te ON e.id_tipoempleado = te.id;
+    INNER JOIN dbo.EmpleadoTipo te ON e.id_empleadotipo = te.id;
 END
 GO
 
@@ -367,10 +367,10 @@ BEGIN
         e.nombre,
         e.dni,
         e.usuario,
-        e.id_tipoempleado,
-        te.nombre AS nombre_tipoempleado
+        e.id_empleadotipo,
+        te.nombre AS nombre_empleadotipo
     FROM dbo.Empleado e
-    INNER JOIN dbo.TipoEmpleado te ON e.id_tipoempleado = te.id
+    INNER JOIN dbo.EmpleadoTipo te ON e.id_empleadotipo = te.id
     WHERE e.id = @id;
 END
 GO
@@ -380,12 +380,12 @@ CREATE OR ALTER PROCEDURE usp_Empleado_Crear
     @dni NVARCHAR(15),
     @usuario NVARCHAR(50),
     @password_hash NVARCHAR(255),
-    @id_tipoempleado INT
+    @id_empleadotipo INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.Empleado (nombre, dni, usuario, password_hash, id_tipoempleado)
-    VALUES (@nombre, @dni, @usuario, @password_hash, @id_tipoempleado);
+    INSERT INTO dbo.Empleado (nombre, dni, usuario, password_hash, id_empleadotipo)
+    VALUES (@nombre, @dni, @usuario, @password_hash, @id_empleadotipo);
     SELECT SCOPE_IDENTITY() AS id_creado;
 END
 GO
@@ -395,7 +395,7 @@ CREATE OR ALTER PROCEDURE usp_Empleado_Actualizar
     @nombre NVARCHAR(100),
     @dni NVARCHAR(15),
     @usuario NVARCHAR(50),
-    @id_tipoempleado INT
+    @id_empleadotipo INT
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -404,7 +404,7 @@ BEGIN
         nombre = @nombre,
         dni = @dni,
         usuario = @usuario,
-        id_tipoempleado = @id_tipoempleado
+        id_empleadotipo = @id_empleadotipo
     WHERE id = @id;
 END
 GO
@@ -560,7 +560,7 @@ GO
 
 /********************************************************************************
  * MÓDULO: CAJA Y CONFIGURACIÓN FINANCIERA (VERSIÓN COMPLETA)
- * Procedimientos para: Caja, TipoPago, TipoMovimiento
+ * Procedimientos para: Caja, PagoTipo, MovimientoTipo
  ********************************************************************************/
  
 -- ===================================================================
@@ -616,99 +616,99 @@ END
 GO
 
 -- ===================================================================
--- CRUD para la tabla: TipoPago
+-- CRUD para la tabla: PagoTipo
 -- ===================================================================
-PRINT 'Creando SPs para TipoPago...';
+PRINT 'Creando SPs para PagoTipo...';
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoPago_Listar
+CREATE OR ALTER PROCEDURE usp_PagoTipo_Listar
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre FROM dbo.TipoPago;
+    SELECT id, nombre FROM dbo.PagoTipo;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoPago_ObtenerPorId
+CREATE OR ALTER PROCEDURE usp_PagoTipo_ObtenerPorId
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre FROM dbo.TipoPago WHERE id = @id;
+    SELECT id, nombre FROM dbo.PagoTipo WHERE id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoPago_Crear
+CREATE OR ALTER PROCEDURE usp_PagoTipo_Crear
     @nombre NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.TipoPago (nombre) VALUES (@nombre);
+    INSERT INTO dbo.PagoTipo (nombre) VALUES (@nombre);
     SELECT SCOPE_IDENTITY() AS id_creado;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoPago_Actualizar
+CREATE OR ALTER PROCEDURE usp_PagoTipo_Actualizar
     @id INT,
     @nombre NVARCHAR(100)
 AS
 BEGIN
     SET NOCOUNT ON;
-    UPDATE dbo.TipoPago SET nombre = @nombre WHERE id = @id;
+    UPDATE dbo.PagoTipo SET nombre = @nombre WHERE id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoPago_Eliminar
+CREATE OR ALTER PROCEDURE usp_PagoTipo_Eliminar
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    DELETE FROM dbo.TipoPago WHERE id = @id;
+    DELETE FROM dbo.PagoTipo WHERE id = @id;
 END
 GO
 
 -- ===================================================================
--- CRUD para la tabla: TipoMovimiento
+-- CRUD para la tabla: MovimientoTipo
 -- ===================================================================
-PRINT 'Creando SPs para TipoMovimiento...';
+PRINT 'Creando SPs para MovimientoTipo...';
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoMovimiento_Listar
+CREATE OR ALTER PROCEDURE usp_MovimientoTipo_Listar
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre, descripcion FROM dbo.TipoMovimiento;
+    SELECT id, nombre, descripcion FROM dbo.MovimientoTipo;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoMovimiento_ObtenerPorId
+CREATE OR ALTER PROCEDURE usp_MovimientoTipo_ObtenerPorId
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    SELECT id, nombre, descripcion FROM dbo.TipoMovimiento WHERE id = @id;
+    SELECT id, nombre, descripcion FROM dbo.MovimientoTipo WHERE id = @id;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoMovimiento_Crear
+CREATE OR ALTER PROCEDURE usp_MovimientoTipo_Crear
     @nombre NVARCHAR(100),
     @descripcion NVARCHAR(255) = NULL -- Parámetro opcional
 AS
 BEGIN
     SET NOCOUNT ON;
-    INSERT INTO dbo.TipoMovimiento (nombre, descripcion) VALUES (@nombre, @descripcion);
+    INSERT INTO dbo.MovimientoTipo (nombre, descripcion) VALUES (@nombre, @descripcion);
     SELECT SCOPE_IDENTITY() AS id_creado;
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoMovimiento_Actualizar
+CREATE OR ALTER PROCEDURE usp_MovimientoTipo_Actualizar
     @id INT,
     @nombre NVARCHAR(100),
     @descripcion NVARCHAR(255) = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
-    UPDATE dbo.TipoMovimiento 
+    UPDATE dbo.MovimientoTipo 
     SET 
         nombre = @nombre,
         descripcion = @descripcion
@@ -716,12 +716,12 @@ BEGIN
 END
 GO
 
-CREATE OR ALTER PROCEDURE usp_TipoMovimiento_Eliminar
+CREATE OR ALTER PROCEDURE usp_MovimientoTipo_Eliminar
     @id INT
 AS
 BEGIN
     SET NOCOUNT ON;
-    DELETE FROM dbo.TipoMovimiento WHERE id = @id;
+    DELETE FROM dbo.MovimientoTipo WHERE id = @id;
 END
 GO
 
@@ -868,7 +868,7 @@ GO
 CREATE OR ALTER PROCEDURE usp_Comprobante_Crear
     @id_comanda INT,
     @id_cliente INT,
-    @id_tipocomprobante INT,
+    @id_comprobantetipo INT,
     @id_empleado_cajero INT
 AS
 BEGIN
@@ -888,19 +888,19 @@ BEGIN
     -- Paso 2: Generar un número de comprobante (lógica básica)
     -- NOTA: En un sistema de producción real, esto debería usar una tabla de correlativos con bloqueo de transacciones.
     DECLARE @Correlativo INT;
-    DECLARE @TipoDoc CHAR(1) = IIF((SELECT nombre FROM TipoComprobante WHERE id = @id_tipocomprobante) LIKE 'Factura%', 'F', 'B');
+    DECLARE @TipoDoc CHAR(1) = IIF((SELECT nombre FROM ComprobanteTipo WHERE id = @id_comprobantetipo) LIKE 'Factura%', 'F', 'B');
     
-    SET @Correlativo = (SELECT COUNT(*) + 1 FROM dbo.Comprobante WHERE id_tipocomprobante = @id_tipocomprobante);
+    SET @Correlativo = (SELECT COUNT(*) + 1 FROM dbo.Comprobante WHERE id_comprobantetipo = @id_comprobantetipo);
     DECLARE @NumeroComprobante NVARCHAR(50) = @TipoDoc + '001-' + FORMAT(@Correlativo, '00000000');
 
     -- Paso 3: Insertar la cabecera del comprobante
     INSERT INTO dbo.Comprobante (
         numero, fecha_hora, igv, total, 
-        id_tipocomprobante, id_cliente, id_empleado_cajero, id_comanda
+        id_comprobantetipo, id_cliente, id_empleado_cajero, id_comanda
     )
     VALUES (
         @NumeroComprobante, GETDATE(), @IGV, @Total,
-        @id_tipocomprobante, @id_cliente, @id_empleado_cajero, @id_comanda
+        @id_comprobantetipo, @id_cliente, @id_empleado_cajero, @id_comanda
     );
 
     -- Devolver el ID del comprobante recién creado
@@ -919,7 +919,7 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO dbo.DetalleComprobante (
+    INSERT INTO dbo.ComprobanteDetalle (
         id_comprobante, 
         id_producto, 
         cantidad, 
@@ -948,23 +948,23 @@ GO
 -- Se ejecuta para registrar cualquier transacción: un ingreso por venta,
 -- una apertura de caja, un pago a proveedor, etc.
 -- ===================================================================
-CREATE OR ALTER PROCEDURE usp_MovimientoCaja_Crear
+CREATE OR ALTER PROCEDURE usp_CajaMovimiento_Crear
     @cantidad DECIMAL(18, 2),
     @id_caja INT,
-    @id_tipomovimiento INT,
-    @id_tipopago INT,
+    @id_movimientotipo INT,
+    @id_pagotipo INT,
     @id_empleado INT,
     @id_comprobante INT = NULL -- Opcional, solo se usa para ingresos por venta
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    INSERT INTO dbo.MovimientoCaja (
+    INSERT INTO dbo.CajaMovimiento (
         fecha_hora, 
         cantidad, 
         id_caja, 
-        id_tipomovimiento, 
-        id_tipopago, 
+        id_movimientotipo, 
+        id_pagotipo, 
         id_empleado, 
         id_comprobante
     )
@@ -972,8 +972,8 @@ BEGIN
         GETDATE(), 
         @cantidad, 
         @id_caja, 
-        @id_tipomovimiento, 
-        @id_tipopago, 
+        @id_movimientotipo, 
+        @id_pagotipo, 
         @id_empleado, 
         @id_comprobante
     );

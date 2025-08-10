@@ -22,7 +22,7 @@ GO
  ********************************************************************************/
 
 -- Tabla para agrupar tipos de productos (Ej: 'Comidas', 'Bebidas')
-CREATE TABLE GrupoProducto (
+CREATE TABLE ProductoGrupo (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100) NOT NULL
 );
@@ -34,11 +34,11 @@ CREATE TABLE Estacion (
 );
 
 -- Tabla para los tipos de producto, dependiente de un grupo (Ej: 'Entradas', 'Platos de Fondo', 'Gaseosas')
-CREATE TABLE TipoProducto (
+CREATE TABLE ProductoTipo (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100) NOT NULL,
-    id_grupoproducto INT NOT NULL,
-    FOREIGN KEY (id_grupoproducto) REFERENCES GrupoProducto(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+    id_productogrupo INT NOT NULL,
+    FOREIGN KEY (id_productogrupo) REFERENCES ProductoGrupo(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- Tabla principal de productos
@@ -47,9 +47,9 @@ CREATE TABLE Producto (
     nombre NVARCHAR(100) NOT NULL,
     descripcion NVARCHAR(255) NULL,
     precio DECIMAL(18, 2) NOT NULL,
-    id_tipoproducto INT NOT NULL,
+    id_productotipo INT NOT NULL,
     id_estacion INT NOT NULL,
-    FOREIGN KEY (id_tipoproducto) REFERENCES TipoProducto(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (id_productotipo) REFERENCES ProductoTipo(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY (id_estacion) REFERENCES Estacion(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE Producto (
  ********************************************************************************/
 
 -- Tabla para los roles de los empleados (Ej: 'Administrador', 'Cajero', 'Mesero')
-CREATE TABLE TipoEmpleado (
+CREATE TABLE EmpleadoTipo (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100) NOT NULL
 );
@@ -73,8 +73,8 @@ CREATE TABLE Empleado (
     -- En una aplicación real, la contraseña debe ser un HASH, no texto plano.
     -- El tamaño NVARCHAR(255) es adecuado para almacenar hashes.
     password_hash NVARCHAR(255) NOT NULL,
-    id_tipoempleado INT NOT NULL,
-    FOREIGN KEY (id_tipoempleado) REFERENCES TipoEmpleado(id) ON DELETE NO ACTION ON UPDATE NO ACTION
+    id_empleadotipo INT NOT NULL,
+    FOREIGN KEY (id_empleadotipo) REFERENCES EmpleadoTipo(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 
@@ -94,7 +94,7 @@ CREATE TABLE Cliente (
 );
 
 -- Tabla de los tipos de comprobante fiscal (Ej: 'Boleta', 'Factura', 'Nota de Venta')
-CREATE TABLE TipoComprobante (
+CREATE TABLE ComprobanteTipo (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100) NOT NULL
 );
@@ -139,18 +139,18 @@ CREATE TABLE Comprobante (
     fecha_hora DATETIME2 NOT NULL DEFAULT GETDATE(),
     igv DECIMAL(18, 2) NOT NULL,
     total DECIMAL(18, 2) NOT NULL,
-    id_tipocomprobante INT NOT NULL,
+    id_ComprobanteTipo INT NOT NULL,
     id_cliente INT NOT NULL,
     id_empleado_cajero INT NOT NULL,
     id_comanda INT NULL, -- Una venta puede ser directa sin comanda previa
-    FOREIGN KEY (id_tipocomprobante) REFERENCES TipoComprobante(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (id_comprobantetipo) REFERENCES ComprobanteTipo(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY (id_cliente) REFERENCES Cliente(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY (id_empleado_cajero) REFERENCES Empleado(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY (id_comanda) REFERENCES Comanda(id) ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- Tabla de detalle de los comprobantes
-CREATE TABLE DetalleComprobante (
+CREATE TABLE ComprobanteDetalle (
     id INT IDENTITY(1,1) PRIMARY KEY,
     id_comprobante INT NOT NULL,
     id_producto INT NOT NULL,
@@ -172,31 +172,31 @@ CREATE TABLE Caja (
 );
 
 -- Tabla de tipos de movimiento (Ej: 'Ingreso por Venta', 'Egreso por Gasto', 'Apertura')
-CREATE TABLE TipoMovimiento (
+CREATE TABLE MovimientoTipo (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100) NOT NULL,
     descripcion NVARCHAR(255) NULL
 );
 
 -- Tabla de tipos de pago (Ej: 'Efectivo', 'Yape', 'Tarjeta de Crédito')
-CREATE TABLE TipoPago (
+CREATE TABLE PagoTipo (
     id INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100) NOT NULL
 );
 
 -- Tabla central de movimientos de las cajas/cuentas
-CREATE TABLE MovimientoCaja (
+CREATE TABLE CajaMovimiento (
     id INT IDENTITY(1,1) PRIMARY KEY,
     fecha_hora DATETIME2 NOT NULL DEFAULT GETDATE(),
     cantidad DECIMAL(18, 2) NOT NULL, -- Positivo para ingresos, negativo para egresos
     id_caja INT NOT NULL, -- La cuenta que se afecta
-    id_tipomovimiento INT NOT NULL,
-    id_tipopago INT NOT NULL, -- El método con que se hizo el movimiento
+    id_movimientotipo INT NOT NULL,
+    id_pagotipo INT NOT NULL, -- El método con que se hizo el movimiento
     id_empleado INT NOT NULL, -- El empleado que registra el movimiento
     id_comprobante INT NULL, -- Opcional, solo para movimientos asociados a una venta
     FOREIGN KEY (id_caja) REFERENCES Caja(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    FOREIGN KEY (id_tipomovimiento) REFERENCES TipoMovimiento(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
-    FOREIGN KEY (id_tipopago) REFERENCES TipoPago(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (id_movimientotipo) REFERENCES MovimientoTipo(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
+    FOREIGN KEY (id_pagotipo) REFERENCES PagoTipo(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY (id_empleado) REFERENCES Empleado(id) ON DELETE NO ACTION ON UPDATE NO ACTION,
     FOREIGN KEY (id_comprobante) REFERENCES Comprobante(id) ON DELETE SET NULL -- Si se borra el comprobante, no se borra el movimiento, solo se desvincula
 );
@@ -209,34 +209,34 @@ GO
 PRINT 'Insertando datos de configuración iniciales...';
 
 -- Tipos de Empleado
-INSERT INTO TipoEmpleado (nombre) VALUES ('Administrador'), ('Cajero'), ('Mesero'), ('Cocinero');
+INSERT INTO EmpleadoTipo (nombre) VALUES ('Administrador'), ('Cajero'), ('Mesero'), ('Cocinero');
 
 -- Estaciones de Preparación
 INSERT INTO Estacion (nombre) VALUES ('Cocina'), ('Barra'), ('Parrilla'), ('Postres');
 
 -- Grupos de Producto
-INSERT INTO GrupoProducto (nombre) VALUES ('Comidas'), ('Bebidas'), ('Postres');
+INSERT INTO ProductoGrupo (nombre) VALUES ('Comidas'), ('Bebidas'), ('Postres');
 
 -- Tipos de Producto
-INSERT INTO TipoProducto (nombre, id_grupoproducto) VALUES
-('Entradas', (SELECT id FROM GrupoProducto WHERE nombre='Comidas')),
-('Platos de Fondo', (SELECT id FROM GrupoProducto WHERE nombre='Comidas')),
-('Gaseosas', (SELECT id FROM GrupoProducto WHERE nombre='Bebidas')),
-('Licores', (SELECT id FROM GrupoProducto WHERE nombre='Bebidas')),
-('Helados', (SELECT id FROM GrupoProducto WHERE nombre='Postres'));
+INSERT INTO ProductoTipo (nombre, id_productogrupo) VALUES
+('Entradas', (SELECT id FROM ProductoGrupo WHERE nombre='Comidas')),
+('Platos de Fondo', (SELECT id FROM ProductoGrupo WHERE nombre='Comidas')),
+('Gaseosas', (SELECT id FROM ProductoGrupo WHERE nombre='Bebidas')),
+('Licores', (SELECT id FROM ProductoGrupo WHERE nombre='Bebidas')),
+('Helados', (SELECT id FROM ProductoGrupo WHERE nombre='Postres'));
 
 -- Tipos de Comprobante
-INSERT INTO TipoComprobante (nombre) VALUES ('Boleta de Venta Electrónica'), ('Factura Electrónica'), ('Nota de Venta Interna');
+INSERT INTO ComprobanteTipo (nombre) VALUES ('Boleta de Venta Electrónica'), ('Factura Electrónica'), ('Nota de Venta Interna');
 
 -- Tipos de Movimiento de Caja
-INSERT INTO TipoMovimiento (nombre, descripcion) VALUES
+INSERT INTO MovimientoTipo (nombre, descripcion) VALUES
 ('Apertura de Caja', 'Monto inicial al comenzar el turno'),
 ('Ingreso por Venta', 'Ingreso generado por un comprobante de venta'),
 ('Egreso por Gasto', 'Salida de dinero para pagar a proveedores, servicios, etc.'),
 ('Cierre de Caja', 'Monto final al cerrar el turno');
 
 -- Tipos de Pago
-INSERT INTO TipoPago (nombre) VALUES ('Efectivo'), ('Yape'), ('Plin'), ('Tarjeta de Crédito/Débito');
+INSERT INTO PagoTipo (nombre) VALUES ('Efectivo'), ('Yape'), ('Plin'), ('Tarjeta de Crédito/Débito');
 
 -- Cajas/Cuentas
 INSERT INTO Caja (nombre) VALUES ('Caja Efectivo Principal');

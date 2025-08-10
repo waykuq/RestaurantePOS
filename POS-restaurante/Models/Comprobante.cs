@@ -13,4 +13,4 @@
         public int? IdComanda { get; set; } // Permite nulos
     }
 }
-}
+
